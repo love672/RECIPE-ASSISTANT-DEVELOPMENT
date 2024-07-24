@@ -1,42 +1,40 @@
-# Customized-LLM-APP
+## Overview
 
-Building a Retrieval-Augmented Generation (RAG) bot can significantly enhance the capabilities of a language model by incorporating external knowledge to generate more accurate and contextually relevant responses. This guide will walk you through creating a simple RAG bot using Gradio and the Hugging Face APIs.
+This project is about creating a chatbot that assists users in developing unique and delicious recipes. The chatbot is designed to understand the user's preferences, dietary restrictions, and available ingredients to suggest suitable recipes. It's deployed using Hugging Face Spaces and Gradio, making it accessible for anyone with an internet connection.
 
-But how does RAG enhance LLM’s performance?
+## Features
 
-RAG improves the performance of language models by augmenting them with external documents. This method retrieves relevant documents based on the user query and combines them with the original prompt before passing them to the language model for response generation. This approach ensures that the language model can access up-to-date and domain-specific information without the need for extensive retraining.
+The Recipe Assistant Chatbot can:
+- Suggest recipes based on specific ingredients.
+- Adjust recipes according to dietary restrictions.
+- Provide step-by-step cooking instructions.
+- Answer questions about cooking techniques and ingredient substitutions.
 
+## Getting Started
 
+These instructions will guide you on how to get a copy of this project up and running on your local machine for development and testing purposes.
 
-A common scenario of RAG helping LLM (Source)
+### Prerequisites
 
-The basic steps in RAG can be simplified as follows:
+List of software/tools needed and installation instructions.
 
-Input: The question to which the LLM system responds is referred to as the input. If no RAG is used, the LLM is directly used to respond to the question.
+### Installing and Running the Project
 
-Indexing: If RAG is used, then a series of related documents are indexed by chunking them first, generating embeddings of the chunks, and indexing them into a vector store. At inference, the query is also embedded in a similar way.
+Detailed steps on how to install and run the project on a local machine.
 
+## Code Structure
 
-Basic retrieval steps in RAG. (Source)
+Explanation of the code structure, main components, and how they interact with each other.
 
-Retrieval: The relevant documents are obtained by comparing the query against the indexed vectors, also denoted as “Relevant Documents”.
+## Deployment
 
-Generation: The relevant documents are combined with the original prompt as additional context. The combined text and prompt are then passed to the model for response generation which is then prepared as the final output of the system to the user.
+Instructions on how to deploy this application on a live system using Hugging Face Spaces and Gradio.
 
-In the example provided, using the model directly fails to respond to the question due to a lack of knowledge of current events. On the other hand, when using RAG, the system can pull the relevant information needed for the model to answer the question appropriately. (Source)
+## Built With
 
-Now Let’s Build a Chatbot using RAG:
+- Hugging Face Spaces - Used for deploying the chatbot on the web.
+- Gradio - Used for creating the chatbot interface.
 
-I have used Zephyr LLM model and all-MiniLM-L6-v2 sentence transformer model. This sentence-transformers model maps sentences & paragraphs to a 384 dimensional dense vector space and can be used for tasks like clustering or semantic search.
+## Authors
 
-The all-* models were trained on all available training data (more than 1 billion training pairs) and are designed as general purpose models. The all-mpnet-base-v2 model provides the best quality, while all-MiniLM-L6-v2 is 5 times faster and still offers good quality. Toggle All models to see all evaluated original models.
-
-We need the following ingredients:
-
-1. A PDF as your knowledgebase
-
-2. A requirements.txt file
-
-3. An app.py file
-
-4. An account on Hugging Face (See this blog to learn about building a LLM chatbot in Hugging Face)
+- * love goyal *- lo4374755@alphacollege.me
