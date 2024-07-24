@@ -8,42 +8,41 @@ import faiss
 
 client = InferenceClient("HuggingFaceH4/zephyr-7b-beta")
 
-# Placeholder for the app's state
-class MyApp:
-    def __init__(self) -> None:
-        self.documents = []
+class RecipeAssistant:
+    def __init__(self):
+        self.recipes = []
         self.embeddings = None
         self.index = None
-        self.load_pdf("THEDIA1.pdf")
+        self.load_recipes("yourpdf.pdf")
         self.build_vector_db()
 
-    def load_pdf(self, file_path: str) -> None:
-        """Extracts text from a PDF file and stores it in the app's documents."""
+    def load_recipes(self, file_path: str):
+        """Extracts text from a PDF file and stores it in the app's recipes."""
         doc = fitz.open(file_path)
-        self.documents = []
+        self.recipes = []
         for page_num in range(len(doc)):
             page = doc[page_num]
             text = page.get_text()
-            self.documents.append({"page": page_num + 1, "content": text})
-        print("PDF processed successfully!")
+            self.recipes.append({"page": page_num + 1, "content": text})
+        print("Recipe book processed successfully!")
 
-    def build_vector_db(self) -> None:
+    def build_vector_db(self):
         """Builds a vector database using the content of the PDF."""
         model = SentenceTransformer('all-MiniLM-L6-v2')
-        self.embeddings = model.encode([doc["content"] for doc in self.documents])
+        self.embeddings = model.encode([doc["content"] for doc in self.recipes])
         self.index = faiss.IndexFlatL2(self.embeddings.shape[1])
         self.index.add(np.array(self.embeddings))
         print("Vector database built successfully!")
 
-    def search_documents(self, query: str, k: int = 3) -> List[str]:
-        """Searches for relevant documents using vector similarity."""
+    def search_recipes(self, query: str, k: int = 3):
+        """Searches for relevant recipes using vector similarity."""
         model = SentenceTransformer('all-MiniLM-L6-v2')
         query_embedding = model.encode([query])
         D, I = self.index.search(np.array(query_embedding), k)
-        results = [self.documents[i]["content"] for i in I[0]]
-        return results if results else ["No relevant documents found."]
+        results = [self.recipes[i]["content"] for i in I[0]]
+        return results if results else ["No relevant recipes found."]
 
-app = MyApp()
+assistant = RecipeAssistant()
 
 def respond(
     message: str,
@@ -53,7 +52,7 @@ def respond(
     temperature: float,
     top_p: float,
 ):
-    system_message = "You are a knowledgeable DBT coach. You always talk about one options at at a time. you add greetings and you ask questions like real counsellor. Remember you are helpful and a good listener. You are concise and never ask multiple questions, or give long response. You response like a human counsellor accurately and correctly. consider the users as your client. and practice verbal cues only where needed. Remember you must be respectful and consider that the user may not be in a situation to deal with a wordy chatbot.  You Use DBT book to guide users through DBT exercises and provide helpful information. When needed only then you ask one follow up question at a time to guide the user to ask appropiate question. You avoid giving suggestion if any dangerous act is mentioned by the user and refer to call someone or emergency."
+    system_message = "Welcome to Recipe Development Assistant! I'm here to help you develop new and exciting recipes. Whether you're looking for inspiration, need help with ingredient substitutions, or want to understand the science behind cooking, I'm here to assist. Let's create something delicious together!"
     messages = [{"role": "system", "content": system_message}]
 
     for val in history:
@@ -65,14 +64,14 @@ def respond(
     messages.append({"role": "user", "content": message})
 
     # RAG - Retrieve relevant documents
-    retrieved_docs = app.search_documents(message)
+    retrieved_docs = assistant.search_recipes(message)
     context = "\n".join(retrieved_docs)
-    messages.append({"role": "system", "content": "Relevant documents: " + context})
+    messages.append({"role": "system", "content": "Relevant recipes: " + context})
 
     response = ""
     for message in client.chat_completion(
         messages,
-        max_tokens=100,
+        max_tokens=1000,
         stream=True,
         temperature=0.98,
         top_p=0.7,
@@ -84,23 +83,21 @@ def respond(
 demo = gr.Blocks()
 
 with demo:
+    gr.Markdown("🍽 Recipe Development Assistant")
     gr.Markdown(
-        "‼️Disclaimer: This chatbot is based on a DBT exercise book that is publicly available. and just to test RAG implementation.‼️"
+        "📝 This chatbot is designed to assist with recipe development and culinary creativity. "
+        "Please note that we are not professional chefs, and the use of this chatbot is at your own responsibility."
     )
-    
     chatbot = gr.ChatInterface(
         respond,
         examples=[
-            ["I feel overwhelmed with work."],
-            ["Can you guide me through a quick meditation?"],
-            ["How do I stop worrying about things I can't control?"],
-            ["What are some DBT skills for managing anxiety?"],
-            ["Can you explain mindfulness in DBT?"],
-            ["I am interested in DBT excercises"],
-            ["I feel restless. Please help me."],
-            ["I have destructive thoughts coming to my mind repetatively."]
+            ["I'm looking for a new dessert recipe."],
+            ["Can you suggest a substitution for eggs in baking?"],
+            ["How do I make a vegan lasagna?"],
+            ["What is the science behind sourdough fermentation?"],
+            ["Can you help me understand the Maillard reaction?"]
         ],
-        title='Dialectical Behaviour Therapy Assistant👩‍⚕️🧘‍♀️'
+        title='Recipe Development Assistant🍽'
     )
 
 if __name__ == "__main__":
